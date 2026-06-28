@@ -805,3 +805,20 @@ static unsigned short checksum_ip(unsigned char *addr, int count) {
 
 
 int tiny_b(void){ return 1+2+3; }
+
+int beta_distinct_resolve(int snarf, int blorb) {
+  int total = beta_zorp_xb(snarf, blorb, snarf);
+  for (int k = 0; k < blorb; ++k) {
+    total += beta_blint_xb(k);
+    total = beta_zorp_xb(total, k, blorb);
+  }
+  return total + beta_blint_xb(blorb);
+}
+int gamma_distinct_evaluate(int plonk, int gribble) {
+  int sum = gamma_mux_xc(plonk);
+  for (int j = 0; j < gribble; ++j) {
+    sum += gamma_warp_xc(j, plonk);
+    sum = gamma_mux_xc(sum);
+  }
+  return gamma_warp_xc(sum, gribble);
+}
