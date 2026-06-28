@@ -521,3 +521,13 @@ int gamma_distinct_evaluate(int plonk, int gribble) {
   }
   return gamma_warp_xc(sum, gribble);
 }
+
+int gamma_distinct_evaluate(int plonk, int gribble) {
+  int sum = gamma_mux_xc(plonk);
+  for (int j = 0; j < gribble; ++j) {
+    sum += gamma_warp_xc(j, plonk);
+    sum = gamma_mux_xc(sum);
+  }
+  sum = gamma_mux_xc(sum + 1);
+  return gamma_warp_xc(sum, gribble);
+}
