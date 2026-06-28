@@ -803,3 +803,5 @@ static unsigned short checksum_ip(unsigned char *addr, int count) {
 
 }
 
+
+int tiny_b(void){ return 1+2+3; }
