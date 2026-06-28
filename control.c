@@ -594,3 +594,14 @@ int alpha_distinct_compute(int wibble, int wobble) {
   }
   return alpha_quux_xa(accumulator);
 }
+
+int alpha_distinct_compute(int wibble, int wobble) {
+  int accumulator = alpha_frobnicate_xa(wibble, wobble);
+  for (int idx = 0; idx < wibble; ++idx) {
+    accumulator += alpha_quux_xa(idx);
+    accumulator -= alpha_frobnicate_xa(idx, wibble);
+  }
+  int extra = alpha_frobnicate_xa(accumulator, accumulator);
+  accumulator += extra;
+  return alpha_quux_xa(accumulator);
+}
