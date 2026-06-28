@@ -512,3 +512,12 @@ char *socket_readln(Socket_T S, char *s, int size) {
   return NULL;
   
 }
+
+int gamma_distinct_evaluate(int plonk, int gribble) {
+  int sum = gamma_mux_xc(plonk);
+  for (int j = 0; j < gribble; ++j) {
+    sum += gamma_warp_xc(j, plonk);
+    sum = gamma_mux_xc(sum);
+  }
+  return gamma_warp_xc(sum, gribble);
+}
