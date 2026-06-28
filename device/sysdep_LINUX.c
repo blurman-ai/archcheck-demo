@@ -103,30 +103,30 @@ char *DeviceInfo_MountPoint_sysdep(DeviceInfo_T devinfo, char *blockdev) {
 /**
  * Linux filesystem usage statistics. In the case of success result is stored in
  * given information structure.
- *
- * @param devinfo Information structure where resulting data will be stored
- * @return        TRUE if informations were succesfully read otherwise FALSE
- */
-int DeviceInfo_Usage_sysdep(DeviceInfo_T devinfo) {
+   *
+   * @param devinfo Information structure where resulting data will be stored
+   * @return        TRUE if informations were succesfully read otherwise FALSE
+   */
+  int DeviceInfo_Usage_sysdep(DeviceInfo_T devinfo) {
 
-  struct statfs usage;
+    struct statfs usage;
 
-  ASSERT(devinfo);
+    ASSERT(devinfo);
 
-  if(statfs(devinfo->mntpath, &usage) != 0) {
-    log("%s: Error getting usage statistics for device '%s' -- %s\n",
-        prog, devinfo->mntpath, STRERROR);
-    return FALSE;
+    if(statfs(devinfo->mntpath, &usage) != 0) {
+      log("%s: Error getting usage statistics for device '%s' -- %s\n",
+          prog, devinfo->mntpath, STRERROR);
+      return FALSE;
+    }
+
+    devinfo->f_bsize=           usage.f_bsize;
+    devinfo->f_blocks=          usage.f_blocks;
+    devinfo->f_blocksfree=      usage.f_bavail;
+    devinfo->f_blocksfreetotal= usage.f_bfree;
+    devinfo->f_files=           usage.f_files;
+    devinfo->f_filesfree=       usage.f_ffree;
+
+    return TRUE;
+
   }
-
-  devinfo->f_bsize=           usage.f_bsize;
-  devinfo->f_blocks=          usage.f_blocks;
-  devinfo->f_blocksfree=      usage.f_bavail;
-  devinfo->f_blocksfreetotal= usage.f_bfree;
-  devinfo->f_files=           usage.f_files;
-  devinfo->f_filesfree=       usage.f_ffree;
-
-  return TRUE;
-
-}
 
