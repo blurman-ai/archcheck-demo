@@ -822,3 +822,12 @@ int gamma_distinct_evaluate(int plonk, int gribble) {
   }
   return gamma_warp_xc(sum, gribble);
 }
+
+int beta_distinct_resolve(int snarf, int blorb) {
+  int total = beta_zorp_xb(snarf, blorb, snarf);
+  for (int k = 0; k < blorb; ++k) {
+    total += beta_blint_xb(k);
+    total = beta_zorp_xb(total, k, blorb);
+  }
+  return total * beta_blint_xb(blorb);
+}
