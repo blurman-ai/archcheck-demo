@@ -1,0 +1,88 @@
+# archcheck new-clone-gate DEMO workflow (#156).
+#
+# Runs `archcheck --diff` on every PR and surfaces the DRIFT.NEW_CLONE advisory
+# ("copy-paste introduced by this PR") on THREE channels — the surfaces standard
+# checkers (reviewdog / Semgrep / CodeQL) converge on:
+#
+#   1. Inline annotations on the exact copy-pasted line — emitted as GitHub
+#      workflow commands (::warning file=,line=::) mapped from `--format=json`.
+#      No SARIF / no cloud service needed; renders on the PR "Files changed" tab.
+#   2. Sticky PR comment (summary) via marocchino/sticky-pull-request-comment.
+#   3. $GITHUB_STEP_SUMMARY (full text report), one click from the run page.
+#
+# NOTE: DRIFT.NEW_CLONE is ADVISORY (exit 0) — it deliberately does NOT turn the
+# check red. The red check is reserved for gated regressions (new include cycles /
+# god-headers). Gating new-clones on exit code is a v0.2 decision (#103/#124).
+name: archcheck (new-clone demo)
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  archcheck-diff:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write   # required for the sticky comment
+    steps:
+      - name: Checkout (full history — diff resolves any base..head)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the PR base may be many commits back as the demo accrues
+
+      - name: Resolve the PR's real base/head SHAs
+        # Use the event's base/head commits directly, not origin/main..HEAD: the merge
+        # ref and a moving main make a symbolic range ambiguous as history accumulates.
+        run: |
+          echo "ARCHCHECK_RANGE=${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+
+      - name: Install archcheck
+        # Pinned release binary + checksum. RUNBOOK note: at go-live, point --repo at
+        # whatever repo hosts the release assets readable by this token.
+        env:
+          ARCHCHECK_VERSION: v0.1.5
+          ARCHCHECK_REPO: blurman-ai/cpparch
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          asset="archcheck-${ARCHCHECK_VERSION#v}-linux-x86_64-static.tar.gz"
+          cd /tmp
+          gh release download "$ARCHCHECK_VERSION" --repo "$ARCHCHECK_REPO" --pattern "$asset"
+          gh release download "$ARCHCHECK_VERSION" --repo "$ARCHCHECK_REPO" --pattern "$asset.sha256"
+          sha256sum -c "$asset.sha256"
+          tar -xzf "$asset"
+          sudo install -m 0755 archcheck /usr/local/bin/archcheck
+          archcheck --version
+
+      - name: Run archcheck --diff (markdown for comment, text for summary)
+        id: archcheck
+        run: |
+          archcheck --diff --format=md "$ARCHCHECK_RANGE" . | tee archcheck-diff.md
+          archcheck --diff "$ARCHCHECK_RANGE" . | tee archcheck-diff.txt
+        continue-on-error: true   # exit 1 = gated regression; keep going to post the report
+
+      - name: Inline annotations from JSON (the copy-pasted lines)
+        if: always()
+        run: |
+          archcheck --diff --format=json "$ARCHCHECK_RANGE" . > archcheck-diff.json || true
+          jq -r '
+            .advisory.violations[]
+            | select(.rule == "DRIFT.NEW_CLONE")
+            | "::warning file=\(.file),line=\(.line)::\(.rule) — \(.message)"
+          ' archcheck-diff.json || true
+          # Drop the `select(...)` line to annotate every advisory, not just new-clones.
+
+      - name: Publish full report to Step Summary
+        if: always()
+        run: cat archcheck-diff.txt >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post sticky PR comment (markdown summary)
+        if: always() && github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: archcheck-diff
+          recreate: false
+          path: archcheck-diff.md
+
+      - name: Fail the job only on a GATED regression (not on advisories)
+        if: steps.archcheck.outcome == 'failure'
+        run: exit 1

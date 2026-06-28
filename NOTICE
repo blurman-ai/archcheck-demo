@@ -1,0 +1,12 @@
+This demonstration repository bundles the source of monit (https://mmonit.com/monit/),
+version 4.2, solely as a realistic C codebase to demonstrate the archcheck new-clone gate.
+
+monit is licensed under the GNU General Public License; its original COPYING / LICENSE
+files are retained unchanged in this tree. The bundled monit source is unmodified except:
+
+  - addition of seed/widgets.c (a small file of distinctive functions used by the demo);
+  - addition of .github/workflows/archcheck-pr.yml, this NOTICE, and the demo README.md;
+  - per-branch demo mutations (one per pull request) that intentionally introduce or
+    avoid copy-paste, as described in README.md.
+
+archcheck itself is a separate project and is not derived from monit.
