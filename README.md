@@ -1,7 +1,7 @@
-# archcheck — new-clone gate, live demo
+# archcheck — new-clone drift, live demo
 
 > **The 30-second story:** you open a PR. Somewhere in the diff you pasted a function
-> instead of calling it. Before a human even looks, [archcheck](https://github.com/archcheck)
+> instead of calling it. Before a human even looks, [archcheck](https://github.com/blurman-ai/archcheck)
 > leaves a warning **on that exact line**: *"copy-paste introduced (EXACT): clone of `seed/widgets.c`."*
 > It doesn't block you (it's advisory) — it just makes the copy-paste impossible to miss.
 
@@ -23,7 +23,7 @@ warning is informational. (Turning copy-paste into a hard gate is a later opt-in
 Each branch is one PR. Nine **fire** the advisory (real copy-paste — exact, whole-file,
 renamed, and **partial/structural** copies where only part of the code matches) and five stay
 **silent** (they look like copy-paste to a naive tool but aren't). The negatives are the whole
-point — they're the false-positive classes the gate is built to *not* trip on. The `s*` cases
+point — they're the false-positive classes the detector is built to *not* trip on. The `s*` cases
 are Type-3 (near-miss) clones: the copy has an inserted line, a changed token, or extra
 trailing logic, and archcheck still flags it as `STRUCTURAL`.
 
