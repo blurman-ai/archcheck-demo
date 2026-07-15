@@ -18,6 +18,13 @@ name: archcheck (new-clone demo)
 on:
   pull_request:
     branches: [main]
+  # Regenerate the report on an already-merged PR after an archcheck upgrade, so the
+  # comment is rewritten by CI (with its own run log behind it) and never by hand.
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: "PR number to regenerate the report on"
+        required: true
 
 jobs:
   archcheck-diff:
@@ -33,17 +40,30 @@ jobs:
       - name: Resolve the PR's real base/head SHAs
         # Use the event's base/head commits directly, not origin/main..HEAD: the merge
         # ref and a moving main make a symbolic range ambiguous as history accumulates.
+        # On workflow_dispatch the same two SHAs come from the PR the input names.
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          echo "ARCHCHECK_RANGE=${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
+          if [ -n "${{ inputs.pr }}" ]; then
+            base=$(gh pr view "${{ inputs.pr }}" --repo "$GITHUB_REPOSITORY" --json baseRefOid --jq .baseRefOid)
+            head=$(gh pr view "${{ inputs.pr }}" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq .headRefOid)
+            echo "PR_NUMBER=${{ inputs.pr }}" >> "$GITHUB_ENV"
+          else
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+            echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> "$GITHUB_ENV"
+          fi
+          echo "ARCHCHECK_RANGE=$base..$head" >> "$GITHUB_ENV"
 
       - name: Install archcheck
         # Pinned release binary + checksum.
-        # v0.1.7 is the floor for this demo: earlier releases emit the gate icon as a
-        # GitHub emoji shortcode (`:large_yellow_circle:`, not a real alias — it renders
-        # as literal text), and fire TEST.1 on the whitespace-only n5 case that this demo
-        # asserts stays silent.
+        # v0.1.8 is the floor for this demo. Earlier releases render the gate status as an
+        # emoji (v0.1.7) or a broken shortcode (<= v0.1.6); GitHub resolves both to the same
+        # codepoint, not an image, so the status is a tofu box for any reader without an
+        # emoji font. They also fire TEST.1 on the whitespace-only n5 case this demo asserts
+        # stays silent. v0.1.8 reports are pure ASCII.
         env:
-          ARCHCHECK_VERSION: v0.1.7
+          ARCHCHECK_VERSION: v0.1.8
           ARCHCHECK_REPO: blurman-ai/archcheck
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -70,7 +90,7 @@ jobs:
           jq -r '
             .advisory.violations[]
             | select(.rule == "DRIFT.NEW_CLONE")
-            | "::warning file=\(.file),line=\(.line)::\(.rule) — \(.message)"
+            | "::warning file=\(.file),line=\(.line)::\(.rule) - \(.message)"
           ' archcheck-diff.json || true
           # Drop the `select(...)` line to annotate every advisory, not just new-clones.
 
@@ -79,11 +99,12 @@ jobs:
         run: cat archcheck-diff.txt >> "$GITHUB_STEP_SUMMARY"
 
       - name: Post sticky PR comment (markdown summary)
-        if: always() && github.event_name == 'pull_request'
+        if: always()
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: archcheck-diff
           recreate: false
+          number: ${{ env.PR_NUMBER }}
           path: archcheck-diff.md
 
       - name: Fail the job only on a GATED regression (not on advisories)
