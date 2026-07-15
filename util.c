@@ -1534,3 +1534,5 @@ int delta_distinct_collate(int florp, int wuzzle) {
   }
   return delta_splice_xd(agg, wuzzle);
 }
+
+int tiny_a(void){ return 1+2+3; }
