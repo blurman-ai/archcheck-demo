@@ -336,7 +336,7 @@ char *replace_string(char **src, const char *old, const char *new) {
 /**
  * Count the number the sub-string word occurs in s.
  * @param s The String to search for word in
- * @param word 	The sub-string to count in s
+ * @param word   The sub-string to count in s
  */
 int count_words(char *s, const char *word) {
 
@@ -396,27 +396,27 @@ void handle_string_escapes(char *buf) {
       case 'n': 
         *(buf+insertpos)='\n';
         editpos++;
-	break;
+  break;
 
       case 't':
         *(buf+insertpos)='\t';
         editpos++;
-	break;
+  break;
 
       case 'r':
         *(buf+insertpos)='\r';
         editpos++;
-	break;
+  break;
 
       case ' ':
         *(buf+insertpos)=' ';
         editpos++;
-	break;
+  break;
 
       case '\\':
         *(buf+insertpos)='\\';
         editpos++;
-	break;
+  break;
 
       default:
         *(buf+insertpos)=*(buf+editpos);
@@ -469,7 +469,7 @@ int exist_service(const char *name) {
 
   for(s= servicelist; s; s= s->next)
       if(IS(s->name, name))
-	  return TRUE;
+    return TRUE;
 
   return FALSE;
 
@@ -513,7 +513,7 @@ void printrunlist() {
   if(Run.mailservers) {
     MailServer_T mta= Run.mailservers;
     for(mta= Run.mailservers; mta; mta= mta->next)
-	printf("%s%s", mta->host, mta->next?", ":" ");
+  printf("%s%s", mta->host, mta->next?", ":" ");
     printf("\n");
   } else {
     printf("localhost\n");
@@ -521,18 +521,18 @@ void printrunlist() {
 
   printf(" %-18s = %s\n", "Mail from", is_str_defined(Run.MailFormat.from));
   printf(" %-18s = %s\n", "Mail subject",
-	 is_str_defined(Run.MailFormat.subject));
+   is_str_defined(Run.MailFormat.subject));
   printf(" %-18s = %-.20s%s\n", "Mail message",
-	 Run.MailFormat.message?
-	 Run.MailFormat.message:"(not defined)",
-	 Run.MailFormat.message?"..(truncated)":"");
+   Run.MailFormat.message?
+   Run.MailFormat.message:"(not defined)",
+   Run.MailFormat.message?"..(truncated)":"");
 
   printf(" %-18s = %s\n", "Start monit httpd", Run.dohttpd?"True":"False");
   
   if(Run.dohttpd) {
     
     printf(" %-18s = %s\n", "httpd bind address",
-	   Run.bind_addr?Run.bind_addr:"Any/All");
+     Run.bind_addr?Run.bind_addr:"Any/All");
     printf(" %-18s = %d\n", "httpd portnumber", Run.httpdport);
     printf(" %-18s = %s\n", "httpd signature", Run.httpdsig?"True":"False");
     printf(" %-18s = %s\n", "Use ssl encryption", Run.httpdssl?"True":"False");
@@ -542,22 +542,22 @@ void printrunlist() {
       printf(" %-18s = %s\n", "PEM key/cert file", Run.httpsslpem);
 
       if(Run.httpsslclientpem!=NULL) {
-	printf(" %-18s = %s\n", "Client cert file", Run.httpsslclientpem);
+  printf(" %-18s = %s\n", "Client cert file", Run.httpsslclientpem);
       } else {
-	printf(" %-18s = %s\n", "Client cert file", "None");
+  printf(" %-18s = %s\n", "Client cert file", "None");
       } 
 
       printf(" %-18s = %s\n", "Allow self certs", 
-	     Run.allowselfcert?"True":"False");
+       Run.allowselfcert?"True":"False");
 
     }
 
     printf(" %-18s = %s\n", "httpd auth. style",
-	   (Run.credentials!=NULL)&&has_hosts_allow()?
-	   "Basic Authentication and Host allow list":
-	   (Run.credentials!=NULL)?"Basic Authentication":
-	   has_hosts_allow()?"Host allow list":
-	   "No authentication!");
+     (Run.credentials!=NULL)&&has_hosts_allow()?
+     "Basic Authentication and Host allow list":
+     (Run.credentials!=NULL)?"Basic Authentication":
+     has_hosts_allow()?"Host allow list":
+     "No authentication!");
      
   }
 
@@ -570,31 +570,31 @@ void printrunlist() {
         printf("All events");
       } else {
         if(IS_EVENT_SET(list->events, EVENT_START))
-	  printf("Start ");
+    printf("Start ");
         if(IS_EVENT_SET(list->events, EVENT_STOP))
-	  printf("Stop ");
+    printf("Stop ");
         if(IS_EVENT_SET(list->events, EVENT_RESTART))
-	  printf("Restart ");
+    printf("Restart ");
         if(IS_EVENT_SET(list->events, EVENT_CHECKSUM))
-	  printf("Checksum ");
+    printf("Checksum ");
         if(IS_EVENT_SET(list->events, EVENT_RESOURCE))
-	  printf("Resource ");
+    printf("Resource ");
         if(IS_EVENT_SET(list->events, EVENT_TIMEOUT))
-	  printf("Timeout ");
+    printf("Timeout ");
         if(IS_EVENT_SET(list->events, EVENT_TIMESTAMP))
-	  printf("Timestamp ");
+    printf("Timestamp ");
         if(IS_EVENT_SET(list->events, EVENT_SIZE))
-	  printf("Size ");
+    printf("Size ");
         if(IS_EVENT_SET(list->events, EVENT_CONNECTION))
-	  printf("Connection ");
+    printf("Connection ");
         if(IS_EVENT_SET(list->events, EVENT_PERMISSION))
-	  printf("Permission ");
+    printf("Permission ");
         if(IS_EVENT_SET(list->events, EVENT_UID))
-	  printf("Uid ");
+    printf("Uid ");
         if(IS_EVENT_SET(list->events, EVENT_GID))
-	  printf("Gid ");
+    printf("Gid ");
         if(IS_EVENT_SET(list->events, EVENT_UNMONITOR))
-	  printf("Unmonitor ");
+    printf("Unmonitor ");
       }
       printf("\n");
     }
@@ -687,29 +687,29 @@ void printservice(Service_T s) {
     for(n= s->portlist; n; n= n->next) {
       
       if(n->family == AF_INET) {
-	
-	if(n->SSL.use_ssl) {
-	  
-	  printf(" %-20s = %s:%d%s [protocol %s via SSL] with timeout %d seconds\n",
-	        "Host:Port", n->hostname, n->port, n->request?n->request:"",
-		 n->protocol->name, n->timeout);
-	  
-	  if(n->SSL.certmd5 != NULL)
-	      printf(" %-20s = %s\n", "Server cert md5 sum", n->SSL.certmd5);
-	  
+  
+  if(n->SSL.use_ssl) {
+    
+    printf(" %-20s = %s:%d%s [protocol %s via SSL] with timeout %d seconds\n",
+          "Host:Port", n->hostname, n->port, n->request?n->request:"",
+     n->protocol->name, n->timeout);
+    
+    if(n->SSL.certmd5 != NULL)
+        printf(" %-20s = %s\n", "Server cert md5 sum", n->SSL.certmd5);
+    
         } else {
 
-	  printf(" %-20s = %s:%d%s [protocol %s] with timeout %d seconds\n",
-	         "Host:Port", n->hostname, n->port, n->request?n->request:"",
-		 n->protocol->name, n->timeout);
-	  
-	}
-	
+    printf(" %-20s = %s:%d%s [protocol %s] with timeout %d seconds\n",
+           "Host:Port", n->hostname, n->port, n->request?n->request:"",
+     n->protocol->name, n->timeout);
+    
+  }
+  
       } else if(n->family == AF_UNIX) {
-	
+  
         printf(" %-20s = %s [protocol %s] with timeout %d seconds\n",
-	       "Unix Socket", n->pathname, n->protocol->name, n->timeout);
-	
+         "Unix Socket", n->pathname, n->protocol->name, n->timeout);
+  
       }
       
     }
@@ -725,14 +725,14 @@ void printservice(Service_T s) {
     
     if(t->test_changes) {
       printf(" %-20s = if changed then %s\n",
-	     "Timestamp",
-	     actionnames[t->action]);
+       "Timestamp",
+       actionnames[t->action]);
     } else {
       printf(" %-20s = if %s %d second(s) then %s\n",
-	     "Timestamp",
-	     operatornames[t->operator],
-	     t->time,
-	     actionnames[t->action]);
+       "Timestamp",
+       operatornames[t->operator],
+       t->time,
+       actionnames[t->action]);
     }
     
   }
@@ -741,14 +741,14 @@ void printservice(Service_T s) {
     
     if(sl->test_changes) {
       printf(" %-20s = if changed then %s\n",
-	     "Size",
-	     actionnames[sl->action]);
+       "Size",
+       actionnames[sl->action]);
     } else {
       printf(" %-20s = if %s %lu byte(s) then %s\n",
-	     "Size",
-	     operatornames[sl->operator],
-	     sl->size,
-	     actionnames[sl->action]);
+       "Size",
+       operatornames[sl->operator],
+       sl->size,
+       actionnames[sl->action]);
     }
     
   }
@@ -784,49 +784,49 @@ void printservice(Service_T s) {
     case RESOURCE_ID_CPU_PERCENT: 
 
       printf(" %-20s = if %s %.1f%% for %d cycle(s) then %s\n", 
-	     "CPU usage limit", 
-	     operatornames[q->operator], 
-	     q->limit/10.0, q->max_cycle, actionnames[q->action]);
+       "CPU usage limit", 
+       operatornames[q->operator], 
+       q->limit/10.0, q->max_cycle, actionnames[q->action]);
       break;
 
     case RESOURCE_ID_MEM_PERCENT: 
 
       printf(" %-20s = if %s %.1f%% for %d cycle(s) then %s\n", 
-	     "Memory usage limit", 
-	     operatornames[q->operator], q->limit/10.0, q->max_cycle, 
-	     actionnames[q->action]);
+       "Memory usage limit", 
+       operatornames[q->operator], q->limit/10.0, q->max_cycle, 
+       actionnames[q->action]);
       break;
 
     case RESOURCE_ID_MEM_KBYTE: 
 
       printf(" %-20s = if %s %ldkB for %d cycle(s) then %s\n", 
-	     "Memory amount limit", 
-	     operatornames[q->operator], q->limit, q->max_cycle, 
-	     actionnames[q->action]);
+       "Memory amount limit", 
+       operatornames[q->operator], q->limit, q->max_cycle, 
+       actionnames[q->action]);
       break;
 
     case RESOURCE_ID_LOAD1: 
 
       printf(" %-20s = if %s %.1f for %d cycle(s) then %s\n", 
-	     "Load avg. (1min)", 
-	     operatornames[q->operator], q->limit/10.0, q->max_cycle, 
-	     actionnames[q->action]);
+       "Load avg. (1min)", 
+       operatornames[q->operator], q->limit/10.0, q->max_cycle, 
+       actionnames[q->action]);
       break;
 
     case RESOURCE_ID_LOAD5: 
 
       printf(" %-20s = if %s %.1f for %d cycle(s) then %s\n", 
-	     "Load avg. (5min)", 
-	     operatornames[q->operator], q->limit/10.0, q->max_cycle, 
-	     actionnames[q->action]);
+       "Load avg. (5min)", 
+       operatornames[q->operator], q->limit/10.0, q->max_cycle, 
+       actionnames[q->action]);
       break;
 
     case RESOURCE_ID_LOAD15: 
 
       printf(" %-20s = if %s %.1f for %d cycle(s) then %s\n", 
-	     "Load avg. (15min)", 
-	     operatornames[q->operator], q->limit/10.0, q->max_cycle, 
-	     actionnames[q->action]);
+       "Load avg. (15min)", 
+       operatornames[q->operator], q->limit/10.0, q->max_cycle, 
+       actionnames[q->action]);
       break;
 
     }    
@@ -838,7 +838,7 @@ void printservice(Service_T s) {
 
   if(s->def_timeout)
     printf(" %-20s = Do timeout if %d restart within %d cycles\n",
-	   "Timeout", s->to_start, s->to_cycle);
+     "Timeout", s->to_start, s->to_cycle);
 
   for(r= s->maillist; r; r= r->next) {
     
@@ -851,31 +851,31 @@ void printservice(Service_T s) {
 
     } else {
       if(IS_EVENT_SET(r->events, EVENT_START))
-	  printf("Start ");
+    printf("Start ");
       if(IS_EVENT_SET(r->events, EVENT_STOP))
-	  printf("Stop ");
+    printf("Stop ");
       if(IS_EVENT_SET(r->events, EVENT_RESTART))
-	  printf("Restart ");
+    printf("Restart ");
       if(IS_EVENT_SET(r->events, EVENT_CHECKSUM))
-	  printf("Checksum ");
+    printf("Checksum ");
       if(IS_EVENT_SET(r->events, EVENT_RESOURCE))
-	  printf("Resource ");
+    printf("Resource ");
       if(IS_EVENT_SET(r->events, EVENT_TIMEOUT))
-	  printf("Timeout ");
+    printf("Timeout ");
       if(IS_EVENT_SET(r->events, EVENT_TIMESTAMP))
-	  printf("Timestamp ");
+    printf("Timestamp ");
       if(IS_EVENT_SET(r->events, EVENT_SIZE))
-	  printf("Size ");
+    printf("Size ");
       if(IS_EVENT_SET(r->events, EVENT_CONNECTION))
-	  printf("Connection ");
+    printf("Connection ");
       if(IS_EVENT_SET(r->events, EVENT_PERMISSION))
-	  printf("Permission ");
+    printf("Permission ");
       if(IS_EVENT_SET(r->events, EVENT_UID))
-	  printf("Uid ");
+    printf("Uid ");
       if(IS_EVENT_SET(r->events, EVENT_GID))
-	  printf("Gid ");
+    printf("Gid ");
       if(IS_EVENT_SET(r->events, EVENT_UNMONITOR))
-	  printf("Unmonitor ");
+    printf("Unmonitor ");
     }
     
     printf("\n");
@@ -938,7 +938,7 @@ pid_t get_pid(char *pidfile) {
   if((file= fopen(pidfile,"r")) == (FILE *)NULL) {
     
     log("%s: Error opening the pidfile '%s' -- %s\n",
-	prog, pidfile, STRERROR);
+  prog, pidfile, STRERROR);
     return(FALSE);
     
   }
@@ -949,7 +949,7 @@ pid_t get_pid(char *pidfile) {
   if(pid == -1) {
     
     log("%s: pidfile `%s' does not contain a valid pidnumber\n",
-	prog, pidfile);
+  prog, pidfile);
     
     return (FALSE);
     
@@ -1119,17 +1119,17 @@ char *get_checksum(char *file, int hashtype) {
       }
       
       if(fresult) {
-	
-	fclose(f);
-	
-	return NULL;
-	
+  
+  fclose(f);
+  
+  return NULL;
+  
       }
       
       fclose(f);
       
       for(i= 0; i < hashlength; ++i)
-	r+= snprintf(r, STRLEN-(r-result) ,"%02x", buf[i]);
+  r+= snprintf(r, STRLEN-(r-result) ,"%02x", buf[i]);
     
       return (xstrdup(result));
       
