@@ -37,11 +37,14 @@ jobs:
           echo "ARCHCHECK_RANGE=${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
 
       - name: Install archcheck
-        # Pinned release binary + checksum. RUNBOOK note: at go-live, point --repo at
-        # whatever repo hosts the release assets readable by this token.
+        # Pinned release binary + checksum.
+        # v0.1.7 is the floor for this demo: earlier releases emit the gate icon as a
+        # GitHub emoji shortcode (`:large_yellow_circle:`, not a real alias — it renders
+        # as literal text), and fire TEST.1 on the whitespace-only n5 case that this demo
+        # asserts stays silent.
         env:
-          ARCHCHECK_VERSION: v0.1.5
-          ARCHCHECK_REPO: blurman-ai/cpparch
+          ARCHCHECK_VERSION: v0.1.7
+          ARCHCHECK_REPO: blurman-ai/archcheck
           GH_TOKEN: ${{ github.token }}
         run: |
           asset="archcheck-${ARCHCHECK_VERSION#v}-linux-x86_64-static.tar.gz"
