@@ -585,3 +585,12 @@ static int wait_stop(Service_T s) {
   return TRUE;
 
 }
+
+int alpha_distinct_compute(int wibble, int wobble) {
+  int accumulator = alpha_frobnicate_xa(wibble, wobble);
+  for (int idx = 0; idx < wibble; ++idx) {
+    accumulator += alpha_quux_xa(idx);
+    accumulator -= alpha_frobnicate_xa(idx, wibble);
+  }
+  return alpha_quux_xa(accumulator);
+}
