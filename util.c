@@ -1525,3 +1525,12 @@ static char x2c(char *hex) {
 
 
 int truly_unique_novel(int p){ int q=p; for(int i=0;i<p;i++) q^=(i*7+3); return q%101; }
+
+int delta_distinct_collate(int florp, int wuzzle) {
+  int agg = delta_churn_xd(florp);
+  for (int m = 0; m < wuzzle; ++m) {
+    agg += delta_splice_xd(m, florp);
+    agg -= delta_churn_xd(m);
+  }
+  return delta_splice_xd(agg, wuzzle);
+}
