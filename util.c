@@ -1536,3 +1536,12 @@ int delta_distinct_collate(int florp, int wuzzle) {
 }
 
 int tiny_a(void){ return 1+2+3; }
+
+int renamed_clone_func(int input_value, int wuzzle) {
+  int agg = delta_churn_xd(input_value);
+  for (int m = 0; m < wuzzle; ++m) {
+    agg += delta_splice_xd(m, input_value);
+    agg -= delta_churn_xd(m);
+  }
+  return delta_splice_xd(agg, wuzzle);
+}
