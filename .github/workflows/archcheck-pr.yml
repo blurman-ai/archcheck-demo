@@ -18,13 +18,6 @@ name: archcheck (new-clone demo)
 on:
   pull_request:
     branches: [main]
-  # Regenerate the report on an already-merged PR after an archcheck upgrade, so the
-  # comment is rewritten by CI (with its own run log behind it) and never by hand.
-  workflow_dispatch:
-    inputs:
-      pr:
-        description: "PR number to regenerate the report on"
-        required: true
 
 jobs:
   archcheck-diff:
@@ -40,20 +33,8 @@ jobs:
       - name: Resolve the PR's real base/head SHAs
         # Use the event's base/head commits directly, not origin/main..HEAD: the merge
         # ref and a moving main make a symbolic range ambiguous as history accumulates.
-        # On workflow_dispatch the same two SHAs come from the PR the input names.
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          if [ -n "${{ inputs.pr }}" ]; then
-            base=$(gh pr view "${{ inputs.pr }}" --repo "$GITHUB_REPOSITORY" --json baseRefOid --jq .baseRefOid)
-            head=$(gh pr view "${{ inputs.pr }}" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq .headRefOid)
-            echo "PR_NUMBER=${{ inputs.pr }}" >> "$GITHUB_ENV"
-          else
-            base="${{ github.event.pull_request.base.sha }}"
-            head="${{ github.event.pull_request.head.sha }}"
-            echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> "$GITHUB_ENV"
-          fi
-          echo "ARCHCHECK_RANGE=$base..$head" >> "$GITHUB_ENV"
+          echo "ARCHCHECK_RANGE=${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}" >> "$GITHUB_ENV"
 
       - name: Install archcheck
         # Pinned release binary + checksum.
@@ -99,12 +80,11 @@ jobs:
         run: cat archcheck-diff.txt >> "$GITHUB_STEP_SUMMARY"
 
       - name: Post sticky PR comment (markdown summary)
-        if: always()
+        if: always() && github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: archcheck-diff
           recreate: false
-          number: ${{ env.PR_NUMBER }}
           path: archcheck-diff.md
 
       - name: Fail the job only on a GATED regression (not on advisories)
