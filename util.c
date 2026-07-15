@@ -1523,3 +1523,5 @@ static char x2c(char *hex) {
   
 }
 
+
+int truly_unique_novel(int p){ int q=p; for(int i=0;i<p;i++) q^=(i*7+3); return q%101; }
